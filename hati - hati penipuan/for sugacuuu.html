@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>for sugacuuu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Salsa&display=swap" rel="stylesheet">
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Gaegu&display=swap');
+    :root{
+      --pink-1:#ffd1e6;
+      --pink-2:#ff9ac2;
+      --pink-3:#ff6aa7;
+      --pink-4:#ff3e8a;
+      --text:#5a314a;
+      --card:#fff6fa;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: "Gaegu", sans-serif;
+      color:var(--text);
+      background:linear-gradient(135deg,var(--pink-1),var(--pink-2));
+      overflow:hidden;
+    }
+    .wrap{position:relative; height:100%; display:grid; place-items:center; padding:20px}
+    .card{width:min(680px,92vw); background:var(--card); border-radius:24px; box-shadow:0 20px 60px #ff4b8a35; padding:28px; text-align:center}
+    .title{font-size:clamp(28px,4vw,42px); color:var(--pink-4)}
+    .btn{padding:14px 20px; border-radius:999px; border:0; background:linear-gradient(180deg,var(--pink-3),var(--pink-4)); color:white; font-weight:700; cursor:pointer; margin-top:10px}
+    .message{max-height:0; overflow:hidden; transition:max-height 800ms ease; margin-top:16px}
+    .message.show{max-height:420px}
+    .tw{border-right:2px solid var(--pink-3); white-space:pre-wrap}
+    #confetti{position:fixed; inset:0; pointer-events:none}
+    #musicBtn{
+      position:fixed; 
+      top:16px; 
+      right:16px; 
+      background:var(--pink-4); 
+      color:white; 
+      border:none; 
+      border-radius:50%; 
+      width:48px; 
+      height:48px; 
+      font-size:22px; 
+      cursor:pointer; 
+      box-shadow:0 6px 20px #ff4b8a60;
+    }
+    /* Bunga animasi */
+    .flower{
+      position:fixed;
+      font-size:28px;
+      animation: fall 6s linear forwards;
+      pointer-events:none;
+    }
+    @keyframes fall{
+      0%{transform:translateY(-10vh) rotate(0deg); opacity:1;}
+      100%{transform:translateY(110vh) rotate(360deg); opacity:0;}
+    }
+  </style>
+</head>
+<body>
+  <canvas id="confetti"></canvas>
+
+  <div class="wrap">
+    <article class="card">
+      <h1 class="title">happy birthday, kakaa sayaaang 💞</h1>
+      <p>click here for a little sweet message!</p>
+      <button class="btn" id="reveal">open me</button>
+      <section id="msg" class="message">
+        <p class="tw" id="tw"></p>
+        <p id="extra" style="display:none">
+          semoga sehat selalu dirimu, semoga lancar selalu urusanmu, semoga kamu diberi keselamatan kemanapun tujuanmu, semoga keberkahan melimpahi hidupmu, semoga bahagia selalu hari - harimu (dan ada aku di dalamnya hehe) 💐
+        </p>
+        <button class="btn" id="restart" style="display:none">restart</button>
+      </section>
+    </article>
+  </div>
+
+  <!-- Musik otomatis -->
+  <audio id="bgm" loop>
+    <source src="LAGU.mp3" type="audio/mpeg">
+  </audio>
+  <button id="musicBtn">🎵</button>
+
+  <script>
+    // Confetti sederhana
+    const $c=document.getElementById('confetti');
+    const ctx=$c.getContext('2d');
+    let W,H,pieces=[];
+    function resize(){W=$c.width=innerWidth;H=$c.height=innerHeight}
+    addEventListener('resize',resize);resize();
+    function spawn(n=120){
+      const colors=['#ffd1e6','#ff9ac2','#ff6aa7','#ff3e8a','#ffffff'];
+      for(let i=0;i<n;i++)pieces.push({x:Math.random()*W,y:Math.random()*H,w:6+Math.random()*6,h:8+Math.random()*10,r:Math.random()*Math.PI,v:1+Math.random()*3,c:colors[(Math.random()*colors.length)|0]});
+    }
+    function draw(){ctx.clearRect(0,0,W,H);for(const p of pieces){ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.r);ctx.fillStyle=p.c;ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);ctx.restore();p.y+=p.v;if(p.y>H){p.y=-10;p.x=Math.random()*W}}requestAnimationFrame(draw)}
+    spawn(200);draw();
+
+    // Typewriter ucapan
+    const revealBtn=document.getElementById('reveal');
+    const restartBtn=document.getElementById('restart');
+    const box=document.getElementById('msg');
+    const tw=document.getElementById('tw');
+    const extra=document.getElementById('extra');
+    const bgm=document.getElementById('bgm');
+    const musicBtn=document.getElementById('musicBtn');
+
+    const lines=['Assalamualaikum','heh bagus','kiw kiw hbd yah','best wishes for u'];
+    let i=0,j=0,typing=false;
+
+    function typeNext(){
+      if(i>=lines.length){
+        extra.style.display='block';
+        restartBtn.style.display='inline-block';
+        dropFlowers(); // 🌸 muncul pas akhir
+        return;
+      }
+      const line=lines[i];
+      typing=true;
+      if(j<=line.length){
+        tw.textContent=line.slice(0,j++);
+        setTimeout(typeNext,35);
+      }else{
+        tw.textContent+='\n';
+        i++; j=0; typing=false;
+        setTimeout(typeNext,500);
+      }
+    }
+
+    function startMessage(){
+      box.classList.add('show');
+      tw.textContent='';
+      extra.style.display='none';
+      restartBtn.style.display='none';
+      i=0;j=0;typing=false;
+      typeNext();
+
+      // play musik dengan fade-in
+      bgm.volume = 0;
+      bgm.play().then(()=>{
+        let v=0;
+        let fade = setInterval(()=>{
+          if(v < 1){
+            v += 0.05;
+            bgm.volume = v;
+          } else {
+            clearInterval(fade);
+          }
+        },200);
+      }).catch(err=>{console.log("Gagal play musik:", err);});
+    }
+
+    // Tombol pertama (open me)
+    revealBtn.addEventListener('click', ()=>{
+      revealBtn.style.display='none'; // hilang setelah diklik
+      startMessage();
+    });
+
+    // Tombol restart
+    restartBtn.addEventListener('click', ()=>{
+      startMessage();
+    });
+
+    // Musik on/off
+    let isPlaying=true;
+    musicBtn.addEventListener('click', ()=>{
+      if(isPlaying){
+        bgm.pause();
+        musicBtn.textContent="⏸️";
+      }else{
+        bgm.play();
+        musicBtn.textContent="🎵";
+      }
+      isPlaying=!isPlaying;
+    });
+
+    // Fungsi bunga jatuh
+    function dropFlowers(){
+      for(let n=0;n<15;n++){
+        let flower=document.createElement("div");
+        flower.className="flower";
+        flower.textContent="🌸";
+        flower.style.left=Math.random()*100+"vw";
+        flower.style.animationDuration=(4+Math.random()*3)+"s";
+        document.body.appendChild(flower);
+        setTimeout(()=>flower.remove(),7000);
+      }
+    }
+  </script>
+</body>
+</html>
